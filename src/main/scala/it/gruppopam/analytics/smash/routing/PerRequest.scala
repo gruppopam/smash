@@ -6,7 +6,6 @@ import spray.http.StatusCodes._
 import spray.routing.RequestContext
 import akka.actor.OneForOneStrategy
 import scala.concurrent.duration._
-import org.json4s.DefaultFormats
 import spray.http.{ContentTypes, HttpEntity, StatusCode}
 import it.gruppopam.analytics.smash.routing.PerRequest._
 import it.gruppopam.analytics.smash.{Error, Validation, RestMessage}
