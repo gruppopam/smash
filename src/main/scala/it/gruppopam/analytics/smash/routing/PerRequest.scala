@@ -8,8 +8,7 @@ import akka.actor.OneForOneStrategy
 import scala.concurrent.duration._
 import spray.http.{HttpResponse, ContentTypes, HttpEntity, StatusCode}
 import it.gruppopam.analytics.smash.routing.PerRequest._
-import it.gruppopam.analytics.smash.{Error, Validation, RestMessage}
-import akka.dispatch.Dispatchers
+import it.gruppopam.analytics.smash.{RestMessage}
 
 trait PerRequest extends Actor {
 
