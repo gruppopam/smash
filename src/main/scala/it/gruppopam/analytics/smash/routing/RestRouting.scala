@@ -1,11 +1,11 @@
 package it.gruppopam.analytics.smash.routing
 
-import akka.actor.{ActorRef, Props, Actor}
+import akka.actor.{Props, Actor}
 import spray.routing.{Route, HttpService}
 import it.gruppopam.analytics.smash.core.FactsCollector
 import it.gruppopam.analytics.smash.{Facts, RestMessage}
-import it.gruppopam.analytics.smash.clients.FactClient
 import it.gruppopam.analytics.smash.FactsJsonSupport._
+import it.gruppopam.analytics.smash.clients.FactClient
 
 class RestRouting extends HttpService with Actor with PerRequestCreator {
 
@@ -13,7 +13,7 @@ class RestRouting extends HttpService with Actor with PerRequestCreator {
 
   def receive = runRoute(route)
 
-  val factClient: ActorRef = context.actorOf(Props[FactClient])
+  val factClient = context.actorOf(Props[FactClient].withDispatcher("balancing-dispatcher"))
 
   val route = {
     post {

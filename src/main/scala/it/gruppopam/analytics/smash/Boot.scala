@@ -1,9 +1,11 @@
 package it.gruppopam.analytics.smash
 
 import akka.actor.{Props, ActorSystem}
+
 import it.gruppopam.analytics.smash.routing.RestRouting
-import akka.io.IO
+
 import spray.can.Http
+import akka.io.IO
 
 object Boot extends App {
   implicit val system = ActorSystem("analytics-smash")

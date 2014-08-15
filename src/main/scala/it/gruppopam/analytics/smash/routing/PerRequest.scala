@@ -6,9 +6,10 @@ import spray.http.StatusCodes._
 import spray.routing.RequestContext
 import akka.actor.OneForOneStrategy
 import scala.concurrent.duration._
-import spray.http.{ContentTypes, HttpEntity, StatusCode}
+import spray.http.{HttpResponse, ContentTypes, HttpEntity, StatusCode}
 import it.gruppopam.analytics.smash.routing.PerRequest._
 import it.gruppopam.analytics.smash.{Error, Validation, RestMessage}
+import akka.dispatch.Dispatchers
 
 trait PerRequest extends Actor {
 
@@ -18,16 +19,18 @@ trait PerRequest extends Actor {
   def target: ActorRef
   def message: RestMessage
 
-  setReceiveTimeout(2.seconds)
+  setReceiveTimeout(10.seconds)
   target ! message
 
   def receive = {
-    case res: String => complete(OK, res)
+    case res: String => {
+      complete(OK, res)
+    }
     case ReceiveTimeout   => complete(GatewayTimeout, "Request timeout")
   }
 
   def complete(status: StatusCode, body: String) = {
-    r.complete(status, HttpEntity(ContentTypes.`application/json`, body))
+    r.complete(HttpResponse(status, HttpEntity(ContentTypes.`application/json`, body)))
     stop(self)
   }
 
