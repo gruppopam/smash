@@ -3,8 +3,8 @@ package it.gruppopam.analytics.smash.routing
 import akka.actor.{Props, Actor}
 import spray.routing.{Route, HttpService}
 import it.gruppopam.analytics.smash.core.{Facts, RestMessage, FactsCollector}
-import it.gruppopam.analytics.smash.FactsJsonSupport._
 import spray.caching.Cache
+import it.gruppopam.analytics.smash.FactsJsonSupport._
 
 class RestRouting(implicit val cache: Cache[String]) extends HttpService with Actor with PerRequestCreator {
 
@@ -22,9 +22,17 @@ class RestRouting(implicit val cache: Cache[String]) extends HttpService with Ac
             }
         }
       }
-    }
+    } ~
+      delete {
+        path("cache") {
+          complete {
+            cache.clear()
+          }
+        }
+      }
   }
 
   def requestHandler(message: RestMessage): Route =
     ctx => perRequest(ctx, Props(new FactsCollector), message)
+
 }
