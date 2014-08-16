@@ -5,14 +5,12 @@ import akka.actor.SupervisorStrategy.Escalate
 
 import scala.collection.mutable
 import akka.event.Logging
-import it.gruppopam.analytics.smash.clients.FactPoster
 import scala.concurrent.{ExecutionContext, Future}
-import it.gruppopam.analytics.smash.CollectedFacts
-import it.gruppopam.analytics.smash.Facts
 import akka.actor.OneForOneStrategy
+import spray.caching.Cache
 
 
-class FactsCollector extends Actor with FactPoster {
+class FactsCollector(implicit val cache: Cache[String]) extends Actor with FactPoster {
   implicit val system: ActorSystem = context.system
 
   val log = Logging(context.system, this)
@@ -20,9 +18,9 @@ class FactsCollector extends Actor with FactPoster {
 
   def receive = {
     case Facts(urls, params) => {
-      import ExecutionContext.Implicits.global
+      import system.dispatcher
       log.info("Started Process")
-      val r = urls.foldRight(List[Future[String]]())((url, acc) => post(url, params) :: acc)
+      val r = urls.foldRight(List[Future[String]]())((url, acc) => cachedPost(url, params) :: acc)
       val responses = Future.sequence(r)
       responses onComplete {
         case r => {
