@@ -27,6 +27,7 @@ class RestRouting(implicit val cache: Cache[String]) extends HttpService with Ac
         path("cache") {
           complete {
             cache.clear()
+            "OK"
           }
         }
       }

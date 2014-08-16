@@ -9,9 +9,10 @@ import akka.util.Timeout
 import spray.http._
 import spray.can.Http
 import HttpMethods._
-import spray.caching.{SimpleLruCache, Cache}
+import spray.caching.Cache
 
 trait FactPoster {
+
   import ExecutionContext.Implicits.global
 
   implicit val timeout: Timeout = 5.seconds
@@ -27,11 +28,12 @@ trait FactPoster {
   }
 
 
-  def cachedPost(url:String, params:Map[String, String]): Future[String] = cache(cacheKeyFromUrlsAndParams(url, params)) {
-    post(url, params)
-  }
+  def cachedPost(url: String, params: Map[String, String]): Future[String] =
+    cache(cacheKeyFromUrlsAndParams(url, params)) {
+      post(url, params)
+    }
 
-  def post(url: String, params: Map[String, String]): Future[String] = {
+  private def post(url: String, params: Map[String, String]): Future[String] = {
     system.log.info("Performing request ->")
     for {
       response <- IO(Http).ask(HttpRequest(POST, url)
