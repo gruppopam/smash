@@ -14,7 +14,7 @@ object Boot extends App {
 
   implicit val cachingEnabled = sys.props.getOrElse("enableCaching", "false").toBoolean
 
-  implicit val cache: Cache[String] = new MemcachedCache[String](maxCapacity = 50000, allowFlush = true)
+  implicit val cache: Cache[String] = if(cachingEnabled) new MemcachedCache[String](maxCapacity = 50000, allowFlush = true) else null
 
   val serviceActor = system.actorOf(Props(new RestRouting), name = "rest-routing")
 
