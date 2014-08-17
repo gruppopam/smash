@@ -7,11 +7,9 @@ import spray.caching.Cache
 import it.gruppopam.analytics.smash.FactsJsonSupport._
 
 
-class RestRouting(implicit val cache: Cache[String]) extends HttpService with Actor with PerRequestCreator {
+class RestRouting(implicit val cache: Cache[String], implicit val cachingEnabled: Boolean) extends HttpService with Actor with PerRequestCreator {
 
   implicit def actorRefFactory = context
-
-  implicit val cachingEnabled = sys.props.getOrElse("enableCaching", "false").toBoolean
 
   def receive = runRoute(route)
 

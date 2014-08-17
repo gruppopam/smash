@@ -12,6 +12,8 @@ import org.greencheek.spray.cache.memcached.MemcachedCache
 object Boot extends App {
   implicit val system = ActorSystem("analytics-smash")
 
+  implicit val cachingEnabled = sys.props.getOrElse("enableCaching", "false").toBoolean
+
   implicit val cache: Cache[String] = new MemcachedCache[String](maxCapacity = 50000, allowFlush = true)
 
   val serviceActor = system.actorOf(Props(new RestRouting), name = "rest-routing")
