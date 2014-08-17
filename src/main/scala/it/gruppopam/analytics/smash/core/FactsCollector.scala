@@ -3,7 +3,6 @@ package it.gruppopam.analytics.smash.core
 import akka.actor._
 import akka.actor.SupervisorStrategy.Escalate
 
-import scala.collection.mutable
 import akka.event.Logging
 import scala.concurrent.{ExecutionContext, Future}
 import akka.actor.OneForOneStrategy
@@ -14,7 +13,6 @@ class FactsCollector(implicit val cache: Cache[String], implicit val cachingEnab
   implicit val system: ActorSystem = context.system
 
   val log = Logging(context.system, this)
-  val accumulator = mutable.MutableList[String]()
 
   def receive = {
     case Facts(urls, params) => {
