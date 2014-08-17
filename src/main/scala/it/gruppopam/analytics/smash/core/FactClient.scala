@@ -21,17 +21,15 @@ trait FactPoster {
 
   implicit def cache: Cache[String]
 
+  implicit def cachingEnabled: Boolean
+
   def mapToParams(params: Map[String, String]): String = {
     (params.foldLeft(List[String]()) {
       case (a, (k, v)) => a :+ s"${k}=${v}"
     }).mkString("&")
   }
 
-
-  def cachedPost(url: String, params: Map[String, String]): Future[String] =
-    cache(cacheKeyFromUrlsAndParams(url, params)) {
-      post(url, params)
-    }
+  def cachedPost(url: String, params: Map[String, String]): Future[String] = withCaching(url, params)
 
   private def post(url: String, params: Map[String, String]): Future[String] = {
     system.log.debug(s"Performing request -> ${url} -> ${params}")
@@ -42,6 +40,15 @@ trait FactPoster {
     } yield {
       response.entity.asString
     }
+  }
+
+  private def withCaching(url: String, params: Map[String, String]) = {
+    if (cachingEnabled)
+      cache(cacheKeyFromUrlsAndParams(url, params)) {
+        post(url, params)
+      }
+    else
+      post(url, params)
   }
 
   private def cacheKeyFromUrlsAndParams(url: String, params: Map[String, String]) = {

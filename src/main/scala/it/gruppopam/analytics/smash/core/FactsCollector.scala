@@ -10,7 +10,7 @@ import akka.actor.OneForOneStrategy
 import spray.caching.Cache
 
 
-class FactsCollector(implicit val cache: Cache[String]) extends Actor with FactPoster {
+class FactsCollector(implicit val cache: Cache[String], implicit val cachingEnabled: Boolean) extends Actor with FactPoster {
   implicit val system: ActorSystem = context.system
 
   val log = Logging(context.system, this)

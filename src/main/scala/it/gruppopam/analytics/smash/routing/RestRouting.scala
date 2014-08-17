@@ -11,6 +11,8 @@ class RestRouting(implicit val cache: Cache[String]) extends HttpService with Ac
 
   implicit def actorRefFactory = context
 
+  implicit val cachingEnabled = sys.props.getOrElse("enableCaching", "false").toBoolean
+
   def receive = runRoute(route)
 
   val route = {
