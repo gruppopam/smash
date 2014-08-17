@@ -34,7 +34,7 @@ trait FactPoster {
     }
 
   private def post(url: String, params: Map[String, String]): Future[String] = {
-    system.log.info("Performing request ->")
+    system.log.debug(s"Performing request -> ${url} -> ${params}")
     for {
       response <- IO(Http).ask(HttpRequest(POST, url)
         .withEntity(HttpEntity(ContentTypes.`text/plain`, mapToParams(params))))

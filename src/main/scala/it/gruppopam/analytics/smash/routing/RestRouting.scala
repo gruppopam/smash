@@ -6,6 +6,7 @@ import it.gruppopam.analytics.smash.core.{Facts, RestMessage, FactsCollector}
 import spray.caching.Cache
 import it.gruppopam.analytics.smash.FactsJsonSupport._
 
+
 class RestRouting(implicit val cache: Cache[String]) extends HttpService with Actor with PerRequestCreator {
 
   implicit def actorRefFactory = context
@@ -20,6 +21,7 @@ class RestRouting(implicit val cache: Cache[String]) extends HttpService with Ac
             requestHandler {
               facts
             }
+
         }
       }
     } ~

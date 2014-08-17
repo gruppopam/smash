@@ -19,8 +19,9 @@ class FactsCollector(implicit val cache: Cache[String]) extends Actor with FactP
   def receive = {
     case Facts(urls, params) => {
       import system.dispatcher
-      log.info("Started Process")
+      log.info("Started Process!")
       val r = urls.foldRight(List[Future[String]]())((url, acc) => cachedPost(url, params) :: acc)
+      log.info("All Requests made!")
       val responses = Future.sequence(r)
       responses onComplete {
         case r => {
@@ -31,7 +32,7 @@ class FactsCollector(implicit val cache: Cache[String]) extends Actor with FactP
   }
 
   def respondToCaller(response: Seq[String]) {
-    log.info("Completed Process")
+    log.info("Completed Process!")
     context.parent ! CollectedFacts(response).toString
   }
 
