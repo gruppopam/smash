@@ -7,14 +7,14 @@ import it.gruppopam.analytics.smash.routing.RestRouting
 import spray.can.Http
 import akka.io.IO
 import spray.caching.Cache
-import org.greencheek.spray.cache.memcached.MemcachedCache
 
 object Boot extends App {
   implicit val system = ActorSystem("analytics-smash")
 
   implicit val cachingEnabled = sys.props.getOrElse("enableCaching", "false").toBoolean
 
-  implicit val cache: Cache[String] = if(cachingEnabled) new MemcachedCache[String](maxCapacity = 50000, allowFlush = true) else null
+  implicit val cache: Cache[String] = null
+  //  implicit val acceptance.it.gruppopam.analytics.smash.it.gruppopam.analytics.smash.cache: Cache[String] = if(cachingEnabled) new MemcachedCache[String](maxCapacity = 50000, allowFlush = true) else null
 
   val serviceActor = system.actorOf(Props(new RestRouting), name = "rest-routing")
 

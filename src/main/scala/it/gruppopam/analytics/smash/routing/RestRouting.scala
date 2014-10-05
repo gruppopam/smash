@@ -26,7 +26,7 @@ class RestRouting(implicit val cache: Cache[String], implicit val cachingEnabled
       }
     } ~
       delete {
-        path("cache") {
+        path("acceptance.it.gruppopam.analytics.smash.it.gruppopam.analytics.smash.cache") {
           complete {
             cache.clear()
             "OK"
