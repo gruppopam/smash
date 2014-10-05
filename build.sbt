@@ -22,6 +22,7 @@ resolvers ++= Seq("snapshots", "releases").map(Resolver.sonatypeRepo)
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.1" % "test",
   "org.scalamock" %% "scalamock-scalatest-support" % "3.1.4" % "test",
+  "org.mockito" % "mockito-core" % "1.9.5" % "test",
   "com.typesafe.akka" %% "akka-actor" % "2.3.4",
   "io.spray" %% "spray-can" % "1.3.1",
   "io.spray" %% "spray-routing" % "1.3.1",
