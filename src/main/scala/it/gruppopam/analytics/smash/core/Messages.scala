@@ -1,8 +1,5 @@
 package it.gruppopam.analytics.smash.core
 
-import akka.util.Timeout
-import scala.concurrent.Future
-import scala.util.Try
 
 trait RestMessage
 

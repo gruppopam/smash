@@ -7,14 +7,13 @@ import akka.event.Logging
 import scala.concurrent.{ExecutionContext, Future}
 import akka.actor.OneForOneStrategy
 import spray.caching.Cache
-import spray.http.HttpData
 import scala.util.{Failure, Success}
 import com.redis.RedisClient
 
 
 class FactsCollector(implicit val cache: Cache[Array[Byte]],
                      implicit val cachingEnabled: Boolean,
-                      implicit val client: RedisClient) extends Actor with FactPoster {
+                     implicit val client: RedisClient) extends Actor with FactPoster {
   implicit val system: ActorSystem = context.system
 
   val log = Logging(context.system, this)
@@ -36,7 +35,7 @@ class FactsCollector(implicit val cache: Cache[Array[Byte]],
     log.info("Completed Process!")
     ResponseBuilder(response).response onComplete {
       case Success(x: Response) => context.parent ! x
-      case Failure(_) =>  context.parent ! _
+      case Failure(_) => context.parent ! _
     }
   }
 

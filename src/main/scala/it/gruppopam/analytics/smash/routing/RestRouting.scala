@@ -5,7 +5,6 @@ import spray.routing.{Route, HttpService}
 import it.gruppopam.analytics.smash.core.{Facts, RestMessage, FactsCollector}
 import spray.caching.Cache
 import it.gruppopam.analytics.smash.FactsJsonSupport._
-import spray.http.HttpData
 import com.redis.RedisClient
 
 

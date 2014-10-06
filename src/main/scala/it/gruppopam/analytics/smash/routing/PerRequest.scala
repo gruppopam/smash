@@ -8,7 +8,7 @@ import akka.actor.OneForOneStrategy
 import scala.concurrent.duration._
 import spray.http.{HttpResponse, ContentTypes, HttpEntity, StatusCode}
 import it.gruppopam.analytics.smash.routing.PerRequest._
-import it.gruppopam.analytics.smash.core.RestMessage
+import it.gruppopam.analytics.smash.core.{Response, RestMessage}
 
 trait PerRequest extends Actor {
 
@@ -24,14 +24,14 @@ trait PerRequest extends Actor {
   target ! message
 
   def receive = {
-    case res: String => {
-      complete(OK, res)
+    case res: Response => {
+      complete(OK, res.redisKey)
     }
     case ReceiveTimeout => complete(GatewayTimeout, "Request timeout")
   }
 
   def complete(status: StatusCode, body: String) = {
-    r.complete(HttpResponse(status, HttpEntity(ContentTypes.`application/json`, s"""{'lookup'='$body'}""")))
+    r.complete(HttpResponse(status, HttpEntity(ContentTypes.`application/json`, s"""{"lookup":"$body"}""")))
     stop(self)
   }
 

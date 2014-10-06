@@ -27,6 +27,6 @@ libraryDependencies ++= Seq(
   "io.spray" %% "spray-can" % "1.3.1",
   "io.spray" %% "spray-routing" % "1.3.1",
   "io.spray" %% "spray-caching" % "1.3.1",
-  "io.spray" %% "spray-json" % "1.3.0",
+  "io.spray" %% "spray-json" % "1.2.6",
   "net.debasishg" %% "redisreact" % "0.6"
 )
