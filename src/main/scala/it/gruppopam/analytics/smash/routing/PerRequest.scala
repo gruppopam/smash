@@ -15,7 +15,9 @@ trait PerRequest extends Actor {
   import context._
 
   def r: RequestContext
+
   def target: ActorRef
+
   def message: RestMessage
 
   setReceiveTimeout(10.seconds)
@@ -25,11 +27,11 @@ trait PerRequest extends Actor {
     case res: String => {
       complete(OK, res)
     }
-    case ReceiveTimeout   => complete(GatewayTimeout, "Request timeout")
+    case ReceiveTimeout => complete(GatewayTimeout, "Request timeout")
   }
 
   def complete(status: StatusCode, body: String) = {
-    r.complete(HttpResponse(status, HttpEntity(ContentTypes.`application/json`, body)))
+    r.complete(HttpResponse(status, HttpEntity(ContentTypes.`application/json`, s"""{'lookup'='$body'}""")))
     stop(self)
   }
 
@@ -43,11 +45,13 @@ trait PerRequest extends Actor {
 }
 
 object PerRequest {
+
   case class WithActorRef(r: RequestContext, target: ActorRef, message: RestMessage) extends PerRequest
 
   case class WithProps(r: RequestContext, props: Props, message: RestMessage) extends PerRequest {
     lazy val target = context.actorOf(props)
   }
+
 }
 
 trait PerRequestCreator {

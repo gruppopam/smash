@@ -8,7 +8,7 @@ import it.gruppopam.analytics.smash.cache.RedisSystem._
 object BinaryRedisCache {
   def apply(maxCapacity: Int = 500,
             initialCapacity: Int = 16) = {
-
+    new BinaryRedisCache(maxCapacity, initialCapacity)
   }
 }
 
@@ -18,7 +18,7 @@ class BinaryRedisCache(maxCapacity: Int, initialCapacity: Int)(implicit ec: Exec
 
   override def size: Int = store.size
 
-  override def clear(): Unit = store.clear
+  override def clear(): Unit = store.clear()
 
   override def remove(key: Any): Option[Future[Array[Byte]]] = Option(store.remove(key.toString))
 

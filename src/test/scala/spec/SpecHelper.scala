@@ -12,7 +12,6 @@ object SpecHelper {
   implicit val timeout = Timeout(5 second)
 
   def clearRedis(implicit client: RedisClient) = {
-
     client.flushall()
   }
 }

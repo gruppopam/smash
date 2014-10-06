@@ -19,40 +19,37 @@ trait FactPoster {
 
   implicit def system: ActorSystem
 
-  implicit def cache: Cache[String]
+  implicit def cache: Cache[HttpData]
 
   implicit def cachingEnabled: Boolean
 
+
   def mapToParams(params: Map[String, String]): String = {
-    (params.foldLeft(List[String]()) {
-      case (a, (k, v)) => a :+ s"${k}=${v}"
-    }).mkString("&")
+    params.foldLeft(List[String]()) {
+      case (a, (k, v)) => a :+ s"$k=$v"
+    }.mkString("&")
   }
 
-  def cachedPost(url: String, params: Map[String, String]): Future[String] = withCaching(url, params)
+  def cachedPost(url: String, params: Map[String, String]): Future[HttpData] = withCaching(url, params)
 
-  private def post(url: String, params: Map[String, String]): Future[String] = {
-    system.log.debug(s"Performing request -> ${url} -> ${params}")
+  private def post(url: String, params: Map[String, String]): Future[HttpData] = {
+    system.log.debug(s"Performing request -> $url -> $params")
     for {
       response <- IO(Http).ask(HttpRequest(POST, url)
         .withEntity(HttpEntity(ContentTypes.`text/plain`, mapToParams(params))))
         .mapTo[HttpResponse]
     } yield {
-      response.entity.asString
+      response.entity.data
     }
   }
 
   private def withCaching(url: String, params: Map[String, String]) = {
-    if (cachingEnabled)
-      cache(cacheKeyFromUrlsAndParams(url, params)) {
-        post(url, params)
-      }
-    else
-      post(url, params)
+    if (cachingEnabled) cache(keyGen(url, params), () => post(url, params)) else post(url, params)
   }
 
-  private def cacheKeyFromUrlsAndParams(url: String, params: Map[String, String]) = {
-    s"${url}-${params.toList.sortBy(_._1).toMap.toString}"
+  private def keyGen(url: String, params: Map[String, String]) = {
+    val key = s"""$url-${params.toList.sortBy(_._1).toMap.toString()}"""
+    (md5Generator digest key.getBytes map ("%02x" format _)).mkString
   }
 }
 
