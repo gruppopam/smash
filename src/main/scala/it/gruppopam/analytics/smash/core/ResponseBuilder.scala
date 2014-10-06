@@ -7,13 +7,12 @@ import akka.actor.ActorSystem
 import scala.concurrent.{Promise, Future, ExecutionContext}
 import scala.util.{Failure, Try, Success}
 
-case class ResponseBuilder(responses: Seq[HttpData])(implicit val client: RedisClient,
+case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val client: RedisClient,
                                                      implicit val timeout: Timeout,
                                                      implicit val system: ActorSystem,
                                                      implicit val executionContext: ExecutionContext) {
-  val asBytes: Iterable[Array[Byte]] = responses.map(x => x.toByteArray)
-  val key = (md5Generator.digest(asBytes.flatten.toArray) map ("%02x" format _)).mkString
-  private val redisResult: Future[Long] = client lpush(key, asBytes.asInstanceOf[Seq[Array[Byte]]])
+  val key = (md5Generator.digest(responses.flatten.toArray) map ("%02x" format _)).mkString
+  private val redisResult: Future[Long] = client lpush(key, responses)
 
 
   def response = {

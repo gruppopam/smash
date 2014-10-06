@@ -9,7 +9,7 @@ import spray.http.HttpData
 import com.redis.RedisClient
 
 
-class RestRouting(implicit val cache: Cache[HttpData],
+class RestRouting(implicit val cache: Cache[Array[Byte]],
                   implicit val cachingEnabled: Boolean,
                   implicit val client: RedisClient) extends HttpService with Actor with PerRequestCreator {
 

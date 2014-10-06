@@ -19,7 +19,7 @@ trait FactPoster {
 
   implicit def system: ActorSystem
 
-  implicit def cache: Cache[HttpData]
+  implicit def cache: Cache[Array[Byte]]
 
   implicit def cachingEnabled: Boolean
 
@@ -30,16 +30,16 @@ trait FactPoster {
     }.mkString("&")
   }
 
-  def cachedPost(url: String, params: Map[String, String]): Future[HttpData] = withCaching(url, params)
+  def cachedPost(url: String, params: Map[String, String]): Future[Array[Byte]] = withCaching(url, params)
 
-  private def post(url: String, params: Map[String, String]): Future[HttpData] = {
+  private def post(url: String, params: Map[String, String]): Future[Array[Byte]] = {
     system.log.debug(s"Performing request -> $url -> $params")
     for {
       response <- IO(Http).ask(HttpRequest(POST, url)
         .withEntity(HttpEntity(ContentTypes.`text/plain`, mapToParams(params))))
         .mapTo[HttpResponse]
     } yield {
-      response.entity.data
+      response.entity.data.toByteArray
     }
   }
 
