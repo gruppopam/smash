@@ -10,16 +10,14 @@ case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val client: Red
                                                         implicit val timeout: Timeout,
                                                         implicit val system: ActorSystem,
                                                         implicit val executionContext: ExecutionContext) {
-  val key = (md5Generator.digest(responses.flatten.toArray) map ("%02x" format _)).mkString
+  private[ResponseBuilder] val key = random.nextLong().toString
 
-  private def containsKey = client exists key
+  private[ResponseBuilder] val pushToRedis: Future[Long] = client.lpush(key, responses)
 
-  private def redisResult: Future[Long] = {
-    val p = Promise[Long]()
-    containsKey onComplete {
-      case Success(x: Boolean) => {
-        if (!x) p.completeWith(client.lpush(key, responses)) else p.completeWith(Future[Long](0l))
-      }
+  private val enrichedWithTimeout = {
+    val p = Promise[Boolean]()
+    pushToRedis onComplete {
+      case Success(_) => p completeWith (client expire(key, 25))
       case Failure(_) => p.failure(new RuntimeException("Exception when persisting to redis"))
     }
     p.future
@@ -28,9 +26,9 @@ case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val client: Red
 
   def response = {
     val promise = Promise[Response]()
-    redisResult.onComplete {
+    enrichedWithTimeout onComplete {
       case Success(x) => promise.complete(Try(Response(key)))
-      case Failure(_) => promise.failure(new RuntimeException("Couldnt write response to redis"))
+      case Failure(_) => promise.failure(new RuntimeException("Couldn't write response to redis"))
     }
     promise.future
   }
