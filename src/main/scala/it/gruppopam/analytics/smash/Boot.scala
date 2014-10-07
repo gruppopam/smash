@@ -6,11 +6,12 @@ import it.gruppopam.analytics.smash.routing.RestRouting
 
 import spray.can.Http
 import akka.io.IO
-import spray.caching.Cache
 import com.redis.RedisClient
-import it.gruppopam.analytics.smash.cache.BinaryRedisCache
+import com.spray_cache.redis.RedisCache
+
 
 object Boot extends App {
+
   import scala.concurrent.ExecutionContext.Implicits.global
 
   implicit val system = ActorSystem("analytics-smash")
@@ -19,7 +20,7 @@ object Boot extends App {
 
   implicit val client = RedisClient("localhost", 6379)
 
-  implicit val cache: Cache[Array[Byte]] = if (cachingEnabled) new BinaryRedisCache(maxCapacity = 50000, initialCapacity = 0) else null
+  implicit val cache = if (cachingEnabled) new RedisCache[Array[Byte]](maxCapacity = 50000, initialCapacity = 0) else null
 
   val serviceActor = system.actorOf(Props(new RestRouting), name = "rest-routing")
 

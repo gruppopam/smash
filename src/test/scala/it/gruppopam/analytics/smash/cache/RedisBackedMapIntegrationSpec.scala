@@ -6,6 +6,8 @@ import com.redis.RedisClient
 import scala.concurrent.{Await, Future}
 import org.scalatest.concurrent.ScalaFutures._
 import scala.concurrent.duration._
+import com.spray_cache.redis.RedisBackedMap
+import com.spray_cache.redis.Formats._
 
 class RedisBackedMapIntegrationSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
@@ -19,7 +21,7 @@ class RedisBackedMapIntegrationSpec extends FeatureSpec with GivenWhenThen with 
     scenario("should read from redis if not present in the local store") {
       Given("I create a valid empty redis backed map")
       clearRedis
-      val store = RedisBackedMap(10, 10)
+      val store = RedisBackedMap[Array[Byte]](10, 10)
       store.size shouldBe 0
 
       And("I add a valid entry to the redis store")
@@ -44,7 +46,7 @@ class RedisBackedMapIntegrationSpec extends FeatureSpec with GivenWhenThen with 
 
       Given("I create a valid empty redis backed map")
       clearRedis
-      val store = RedisBackedMap(10, 10)
+      val store = RedisBackedMap[Array[Byte]](10, 10)
       store.size shouldBe 0
 
       val response: Future[Any] = client.get[Array[Byte]]("key")

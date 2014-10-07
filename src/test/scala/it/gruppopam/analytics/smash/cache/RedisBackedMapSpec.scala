@@ -7,10 +7,12 @@ import com.redis.RedisClient
 import org.mockito.Mockito
 import scala.concurrent.Future
 import org.scalatest.concurrent.ScalaFutures._
+import com.spray_cache.redis.RedisBackedMap
 
 class RedisBackedMapSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
   import spec.SpecHelper._
+  import com.spray_cache.redis.Formats._
 
   info("As a Redis backed Map")
   info("I should be able to perform map like operations for")
@@ -48,7 +50,7 @@ class RedisBackedMapSpec extends FeatureSpec with GivenWhenThen with Matchers {
       Given("I create a valid redis backed map")
       implicit val client = MockitoSugar.mock[RedisClient]
       Mockito.when(client.set("key1", "Hello World" getBytes)).thenReturn(Future(true))
-      val store = RedisBackedMap(10, 10)
+      val store = RedisBackedMap[Array[Byte]](10, 10)
 
       And("I add a valid value to the store")
       store.putIfAbsent("key1", () => Future("Hello World" getBytes))
@@ -68,7 +70,7 @@ class RedisBackedMapSpec extends FeatureSpec with GivenWhenThen with Matchers {
     scenario("should be successful when value does not exists") {
       Given("I create a valid redis backed map")
       implicit val client = MockitoSugar.mock[RedisClient]
-      val store = RedisBackedMap(10, 10)
+      val store = RedisBackedMap[Array[Byte]](10, 10)
       store.size shouldBe 0
 
       When("I attempt to remove the key 'key1' from the store")
@@ -85,7 +87,7 @@ class RedisBackedMapSpec extends FeatureSpec with GivenWhenThen with Matchers {
       Given("I create a valid redis backed map")
       implicit val client = MockitoSugar.mock[RedisClient]
       Mockito.when(client.set("key1", "Hello World" getBytes)).thenReturn(Future(true))
-      val store = RedisBackedMap(10, 10)
+      val store = RedisBackedMap[Array[Byte]](10, 10)
       store.size shouldBe 0
 
       And("I put an entry into the store")

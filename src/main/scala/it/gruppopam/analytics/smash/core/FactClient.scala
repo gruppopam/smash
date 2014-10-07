@@ -13,8 +13,6 @@ import spray.caching.Cache
 
 trait FactPoster {
 
-  import ExecutionContext.Implicits.global
-
   implicit val timeout: Timeout = 5.seconds
 
   implicit def system: ActorSystem
@@ -30,9 +28,9 @@ trait FactPoster {
     }.mkString("&")
   }
 
-  def cachedPost(url: String, params: Map[String, String]): Future[Array[Byte]] = withCaching(url, params)
+  def cachedPost(url: String, params: Map[String, String])(implicit ec: ExecutionContext): Future[Array[Byte]] = withCaching(url, params)
 
-  private def post(url: String, params: Map[String, String]): Future[Array[Byte]] = {
+  private def post(url: String, params: Map[String, String])(implicit ec: ExecutionContext): Future[Array[Byte]] = {
     system.log.debug(s"Performing request -> $url -> $params")
     for {
       response <- IO(Http).ask(HttpRequest(POST, url)
@@ -43,7 +41,7 @@ trait FactPoster {
     }
   }
 
-  private def withCaching(url: String, params: Map[String, String]) = {
+  private def withCaching(url: String, params: Map[String, String])(implicit ec: ExecutionContext) = {
     if (cachingEnabled) cache(keyGen(url, params), () => post(url, params)) else post(url, params)
   }
 
