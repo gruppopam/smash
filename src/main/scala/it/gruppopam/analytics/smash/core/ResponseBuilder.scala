@@ -10,7 +10,7 @@ case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val client: Red
                                                         implicit val timeout: Timeout,
                                                         implicit val system: ActorSystem,
                                                         implicit val executionContext: ExecutionContext) {
-  private[ResponseBuilder] val key = random.nextLong().toString
+  private[ResponseBuilder] val key = s"${random.nextLong().toString}-${(md5Generator.digest(responses.flatten.toArray) map ("%02x" format _)).mkString}"
 
   private[ResponseBuilder] val pushToRedis: Future[Long] = client.lpush(key, responses)
 
