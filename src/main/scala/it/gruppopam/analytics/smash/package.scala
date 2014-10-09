@@ -10,7 +10,7 @@ import com.spray_cache.redis.Formats
 
 package object smash {
   implicit val timeout = Timeout(10 seconds)
-  implicit val format = Formats.byteArrayFormat
+  implicit val format = Formats.format
 
   object FactsJsonSupport extends DefaultJsonProtocol with SprayJsonSupport {
     implicit val endpointFormat = jsonFormat2(Fact)

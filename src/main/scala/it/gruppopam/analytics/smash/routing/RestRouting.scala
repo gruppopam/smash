@@ -5,12 +5,13 @@ import spray.routing.{Route, HttpService}
 import it.gruppopam.analytics.smash.core.{Facts, RestMessage, FactsCollector}
 import spray.caching.Cache
 import it.gruppopam.analytics.smash.FactsJsonSupport._
-import com.redis.RedisClient
+import redis.RedisClient
 
 
 class RestRouting(implicit val cache: Cache[Array[Byte]],
                   implicit val cachingEnabled: Boolean,
                   implicit val client: RedisClient) extends HttpService with Actor with PerRequestCreator {
+
 
   implicit def actorRefFactory = context
 

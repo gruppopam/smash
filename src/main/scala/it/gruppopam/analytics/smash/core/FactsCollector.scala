@@ -8,7 +8,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import akka.actor.OneForOneStrategy
 import spray.caching.Cache
 import scala.util.{Failure, Success}
-import com.redis.RedisClient
+import redis.RedisClient
 
 
 class FactsCollector(implicit val cache: Cache[Array[Byte]],

@@ -6,8 +6,8 @@ import it.gruppopam.analytics.smash.routing.RestRouting
 
 import spray.can.Http
 import akka.io.IO
-import com.redis.RedisClient
 import com.spray_cache.redis.RedisCache
+import redis.RedisClient
 
 
 object Boot extends App {
@@ -18,7 +18,7 @@ object Boot extends App {
 
   implicit val cachingEnabled = sys.props.getOrElse("enableCaching", "false").toBoolean
 
-  implicit val client = RedisClient("localhost", 6379)
+  implicit val client = RedisClient()
 
   implicit val cache = if (cachingEnabled) new RedisCache[Array[Byte]](maxCapacity = 50000, initialCapacity = 0) else null
 

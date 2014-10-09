@@ -1,16 +1,20 @@
 package it.gruppopam.analytics.smash.core
 
-import com.redis.RedisClient
+
 import akka.util.Timeout
 import akka.actor.ActorSystem
 import scala.concurrent.{Promise, Future, ExecutionContext}
 import scala.util.{Failure, Try, Success}
+import scala.concurrent.duration._
+import redis.RedisClient
 
-case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val client: RedisClient,
-                                                        implicit val timeout: Timeout,
-                                                        implicit val system: ActorSystem,
+case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val system: ActorSystem,
                                                         implicit val executionContext: ExecutionContext) {
-  private[ResponseBuilder] val key = s"${random.nextLong().toString}-${(md5Generator.digest(responses.flatten.toArray) map ("%02x" format _)).mkString}"
+  implicit val timeout = Timeout(10 seconds)
+
+  val client = RedisClient()
+  system.log.info("Writing #bytes:" + responses.flatten.toArray.length)
+  private[ResponseBuilder] val key = s"${random.nextLong().toString}"
 
   private[ResponseBuilder] val pushToRedis: List[Future[Long]] = responses.foldRight(List[Future[Long]]())((response, acc) => client.lpush(key, response) :: acc)
 
@@ -18,7 +22,9 @@ case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val client: Red
     val p = Promise[Boolean]()
     Future.sequence(pushToRedis) onComplete {
       case Success(_) => p completeWith (client expire(key, 25))
-      case Failure(_) => p.failure(new RuntimeException("Exception when persisting to redis"))
+      case Failure(x) =>
+        x.printStackTrace()
+        p.failure(new RuntimeException("Exception when persisting to redis"))
     }
     p.future
   }
