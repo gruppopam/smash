@@ -12,7 +12,7 @@ case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val client: Red
                                                         implicit val executionContext: ExecutionContext) {
   private[ResponseBuilder] val key = s"${random.nextLong().toString}-${(md5Generator.digest(responses.flatten.toArray) map ("%02x" format _)).mkString}"
 
-  private[ResponseBuilder] val pushToRedis: List[Future[Long]] = responses.foldRight(List[Future[Long]]())((response, acc) => client.lpush(key, response) :: acc)
+  private[ResponseBuilder] val pushToRedis: List[Future[Long]] = responses.grouped(10).foldRight(List[Future[Long]]())((response, acc) => client.lpush(key, response) :: acc)
 
   private val enrichedWithTimeout = {
     val p = Promise[Boolean]()
