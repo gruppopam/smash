@@ -2,18 +2,18 @@ package it.gruppopam.analytics.smash.cache
 
 import org.scalatest.{Matchers, GivenWhenThen, FeatureSpec}
 
-import com.redis.RedisClient
 import scala.concurrent.{Await, Future}
 import org.scalatest.concurrent.ScalaFutures._
 import scala.concurrent.duration._
 import com.spray_cache.redis.RedisBackedMap
 import com.spray_cache.redis.Formats._
+import redis.RedisClient
 
 class RedisBackedMapIntegrationSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
   import spec.SpecHelper._
 
-  implicit val client = RedisClient("localhost", 6379)
+  implicit val client = RedisClient()
 
   info("Redis Backed Map with the real redis")
 

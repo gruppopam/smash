@@ -3,11 +3,11 @@ package it.gruppopam.analytics.smash.cache
 import org.scalatest.{Matchers, GivenWhenThen, FeatureSpec}
 
 import org.scalatest.mock.MockitoSugar
-import com.redis.RedisClient
 import org.mockito.Mockito
 import scala.concurrent.Future
 import org.scalatest.concurrent.ScalaFutures._
 import com.spray_cache.redis.RedisBackedMap
+import redis.RedisClient
 
 class RedisBackedMapSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
