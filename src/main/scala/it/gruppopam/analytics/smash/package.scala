@@ -2,7 +2,7 @@ package it.gruppopam.analytics
 
 import spray.json.DefaultJsonProtocol
 import spray.httpx.SprayJsonSupport
-import it.gruppopam.analytics.smash.core.Facts
+import it.gruppopam.analytics.smash.core.{Fact, Facts}
 
 import akka.util.Timeout
 import scala.concurrent.duration._
@@ -13,8 +13,8 @@ package object smash {
   implicit val format = Formats.byteArrayFormat
 
   object FactsJsonSupport extends DefaultJsonProtocol with SprayJsonSupport {
-    implicit val PortofolioFormats = jsonFormat2(Facts)
-
+    implicit val endpointFormat = jsonFormat2(Fact)
+    implicit val endpointWrapperFormat = jsonFormat1(Facts)
   }
 
 }

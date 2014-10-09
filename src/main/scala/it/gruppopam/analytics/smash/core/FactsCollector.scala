@@ -19,10 +19,10 @@ class FactsCollector(implicit val cache: Cache[Array[Byte]],
   val log = Logging(context.system, this)
 
   def receive = {
-    case Facts(urls, params) => {
+    case Facts(facts) => {
       import system.dispatcher
       log.info("Started Process!")
-      val r = urls.foldRight(List[Future[Array[Byte]]]())((url, acc) => cachedPost(url, params) :: acc)
+      val r = facts.foldRight(List[Future[Array[Byte]]]())((fact, acc) => cachedPost(fact) :: acc)
       log.info("All Requests made!")
       val responses = Future.sequence(r)
       responses onComplete {

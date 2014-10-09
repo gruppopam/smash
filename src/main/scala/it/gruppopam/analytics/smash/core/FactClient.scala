@@ -28,7 +28,7 @@ trait FactPoster {
     }.mkString("&")
   }
 
-  def cachedPost(url: String, params: Map[String, String])(implicit ec: ExecutionContext): Future[Array[Byte]] = withCaching(url, params)
+  def cachedPost(fact: Fact)(implicit ec: ExecutionContext): Future[Array[Byte]] = withCaching(fact)
 
   private def post(url: String, params: Map[String, String])(implicit ec: ExecutionContext): Future[Array[Byte]] = {
     system.log.debug(s"Performing request -> $url -> $params")
@@ -41,8 +41,8 @@ trait FactPoster {
     }
   }
 
-  private def withCaching(url: String, params: Map[String, String])(implicit ec: ExecutionContext) = {
-    if (cachingEnabled) cache(keyGen(url, params), () => post(url, params)) else post(url, params)
+  private def withCaching(fact: Fact)(implicit ec: ExecutionContext) = {
+    if (cachingEnabled) cache(keyGen(fact.url, fact.params), () => post(fact.url, fact.params)) else post(fact.url, fact.params)
   }
 
   private def keyGen(url: String, params: Map[String, String]) = {
