@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import com.spray_cache.redis.Formats
 
 package object smash {
-  implicit val timeout = Timeout(5 second)
+  implicit val timeout = Timeout(10 seconds)
   implicit val format = Formats.byteArrayFormat
 
   object FactsJsonSupport extends DefaultJsonProtocol with SprayJsonSupport {
