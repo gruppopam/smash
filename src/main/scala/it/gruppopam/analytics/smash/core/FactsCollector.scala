@@ -26,8 +26,8 @@ class FactsCollector(implicit val cache: Cache[Array[Byte]],
       log.info("All Requests made!")
       val responses = Future.sequence(r)
       responses onComplete {
-        case (r: Seq[Array[Byte]]) => respondToCaller(r.getOrElse(List[Array[Byte]]()))
-        case (f: Failure) => {
+        case Success(r: Seq[Array[Byte]]) => respondToCaller(r)
+        case Failure(f) => {
           print("Could not get responses:" + f)
         }
       }
