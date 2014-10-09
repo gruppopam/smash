@@ -12,11 +12,11 @@ case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val client: Red
                                                         implicit val executionContext: ExecutionContext) {
   private[ResponseBuilder] val key = s"${random.nextLong().toString}-${(md5Generator.digest(responses.flatten.toArray) map ("%02x" format _)).mkString}"
 
-  private[ResponseBuilder] val pushToRedis: Future[Long] = client.lpush(key, responses)
+  private[ResponseBuilder] val pushToRedis: List[Future[Long]] = responses.foldRight(List[Future[Long]]())((response, acc) => client.lpush(key, response) :: acc)
 
   private val enrichedWithTimeout = {
     val p = Promise[Boolean]()
-    pushToRedis onComplete {
+    Future.sequence(pushToRedis) onComplete {
       case Success(_) => p completeWith (client expire(key, 25))
       case Failure(_) => p.failure(new RuntimeException("Exception when persisting to redis"))
     }
