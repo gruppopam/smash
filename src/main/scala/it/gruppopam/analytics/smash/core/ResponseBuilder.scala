@@ -9,10 +9,10 @@ import scala.concurrent.duration._
 import redis.RedisClient
 
 case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val system: ActorSystem,
-                                                        implicit val executionContext: ExecutionContext) {
+                                                        implicit val executionContext: ExecutionContext,
+                                                        implicit val client: RedisClient) {
   implicit val timeout = Timeout(10 seconds)
 
-  val client = RedisClient()
   system.log.info("Writing #bytes:" + responses.flatten.toArray.length)
   private[ResponseBuilder] val key = s"${random.nextLong().toString}"
 
