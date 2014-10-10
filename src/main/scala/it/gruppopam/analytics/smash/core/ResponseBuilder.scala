@@ -15,12 +15,11 @@ case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val system: Act
 
   system.log.info("Writing #bytes:" + responses.flatten.toArray.length)
   private[ResponseBuilder] val key = s"${random.nextLong().toString}"
-
-  private[ResponseBuilder] val pushToRedis: List[Future[Long]] = responses.foldRight(List[Future[Long]]())((response, acc) => client.lpush(key, response) :: acc)
+  private[ResponseBuilder] val pushToRedis: Future[Long] = client.lpush(key, responses: _*)
 
   private val enrichedWithTimeout = {
     val p = Promise[Boolean]()
-    Future.sequence(pushToRedis) onComplete {
+    pushToRedis onComplete {
       case Success(_) => p completeWith (client expire(key, 25))
       case Failure(x) =>
         x.printStackTrace()
