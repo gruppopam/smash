@@ -27,8 +27,7 @@ class FactsCollector(implicit val cache: Cache[Array[Byte]],
       val responses = Future.sequence(r)
       responses onComplete {
         case Success(r: Seq[Array[Byte]]) => respondToCaller(r)
-        case Failure(f) =>
-          throw new RuntimeException(f)
+        case Failure(f) => context.parent ! new RuntimeException(f.getMessage, f)
       }
     }
   }
@@ -37,9 +36,7 @@ class FactsCollector(implicit val cache: Cache[Array[Byte]],
     log.info("Completed Process!")
     ResponseBuilder(response).response onComplete {
       case Success(x: Response) => context.parent ! x
-      case Failure(x) => {
-        throw new RuntimeException(x)
-      }
+      case Failure(x) => context.parent ! new RuntimeException(x.getMessage, x)
     }
   }
 

@@ -28,10 +28,11 @@ trait PerRequest extends Actor {
       complete(OK, res.redisKey)
     }
     case ReceiveTimeout => complete(GatewayTimeout, "Request timeout")
+    case x: RuntimeException => complete(InternalServerError, x.getMessage)
   }
 
   def complete(status: StatusCode, body: String) = {
-    r.complete(HttpResponse(status, HttpEntity(ContentTypes.`application/json`, s"""{"lookup":"$body"}""")))
+    r.complete(HttpResponse(status, HttpEntity(ContentTypes.`application/json`, s"""["$body"]""")))
     stop(self)
   }
 

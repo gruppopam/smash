@@ -13,8 +13,7 @@ case class ResponseBuilder(responses: Seq[Array[Byte]])(implicit val system: Act
                                                         implicit val client: RedisClient) {
   implicit val timeout = Timeout(10 seconds)
 
-  system.log.info("Writing #bytes:" + responses.flatten.toArray.length)
-  private[ResponseBuilder] val key = s"${random.nextLong().toString}"
+  private[ResponseBuilder] val key = s"${random.nextLong().toString}-${random.nextLong().toString}"
   private[ResponseBuilder] val pushToRedis: Future[Long] = client.lpush(key, responses: _*)
 
   private val enrichedWithTimeout = {
